@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iRoom Cloud - Complete Management</title>
+    <title>iRoom - Cloud Management System (Full Version)</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,31 +17,30 @@
         .bg-navy { background-color: #1e3a8a; }
         .room-card { transition: all 0.3s ease; border-left: 10px solid #1e3a8a; border-radius: 2.5rem; }
         .asset-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 15px; background: #ffffff; border: 1px solid #eef2f6; margin-bottom: 8px; }
-        .photo-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 12px; cursor: zoom-in; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .photo-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: zoom-in; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .photo-thumb:hover { transform: scale(1.1); }
     </style>
 </head>
 <body class="bg-[#f8fafc] font-sans text-slate-900 font-bold">
 
-    <script>
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDXQA3srBFDtihP0ZbjC68EE7yRiEIXva4",
-  authDomain: "iroom-manager.firebaseapp.com",
-  databaseURL: "https://iroom-manager-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "iroom-manager",
-  storageBucket: "iroom-manager.firebasestorage.app",
-  messagingSenderId: "639086774108",
-  appId: "1:639086774108:web:a6211f63774ed65455e399",
-  measurementId: "G-MDPCN0GJY2"
-        };
+    <div id="lightbox" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 cursor-zoom-out" onclick="this.classList.add('hidden')">
+        <img id="lightbox-img" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl border-4 border-white/20">
+    </div>
 
+    <script>
+        // 🚩 [ใส่รหัส Firebase Config ของคุณที่นี่]
+        const firebaseConfig = {
+            apiKey: "AIzaSy...", 
+            authDomain: "iroom-manager.firebaseapp.com",
+            databaseURL: "https://iroom-manager-default-rtdb.asia-southeast1.firebasedatabase.app", 
+            projectId: "iroom-manager",
+            storageBucket: "iroom-manager.appspot.com",
+            messagingSenderId: "xxxxxxxxxxxx",
+            appId: "1:xxxxxxxxxxxx:web:xxxxxxxxxxxx"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
     </script>
-
-    <div id="lightbox" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
-        <img id="lightbox-img" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl">
-    </div>
 
     <div id="main-app" class="flex min-h-screen">
         <div class="w-64 bg-navy text-white p-6 flex flex-col sticky top-0 h-screen shadow-2xl">
@@ -57,7 +56,6 @@ const firebaseConfig = {
             <div class="bg-green-500/20 p-4 rounded-xl text-[10px] text-center text-green-400 mb-4 animate-pulse uppercase italic">
                 <i class="fas fa-sync-alt mr-1"></i> Cloud Connected
             </div>
-            <button onclick="location.reload()" class="w-full p-4 text-white font-bold text-sm bg-white/10 hover:bg-white/20 rounded-2xl transition-all uppercase italic">Refresh</button>
         </div>
 
         <div class="flex-1 p-10">
@@ -76,14 +74,11 @@ const firebaseConfig = {
             <div id="page-inventory" class="page-content">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div class="flex items-center gap-4 w-full md:w-auto">
-                        <h2 class="text-3xl font-black text-navy italic uppercase tracking-tighter shrink-0">Room Assets</h2>
-                        <div class="relative w-full md:w-80">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="search-input" onkeyup="render()" placeholder="Search room..." class="w-full pl-12 pr-4 py-3 bg-white rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-navy outline-none text-sm font-bold">
-                        </div>
+                        <h2 class="text-3xl font-black text-navy italic uppercase tracking-tighter">Room Assets</h2>
+                        <input type="text" id="search-input" onkeyup="render()" placeholder="Search..." class="px-4 py-3 bg-white rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-navy outline-none text-sm font-bold w-full md:w-64">
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="exportData(roomData, 'iRoom_Current_Report')" class="bg-navy text-white px-5 py-2 rounded-xl text-xs font-bold shadow-lg uppercase italic">Excel Export</button>
+                        <button onclick="exportData(roomData, 'iRoom_Current_Inventory')" class="bg-navy text-white px-5 py-2 rounded-xl text-xs font-bold shadow-lg uppercase italic"><i class="fas fa-file-excel mr-2"></i>Export Excel</button>
                         <button onclick="openModal()" class="bg-yellow-400 text-navy px-6 py-2 rounded-xl text-xs font-black shadow-lg hover:scale-105 transition-transform uppercase italic">+ Add Room</button>
                     </div>
                 </div>
@@ -91,14 +86,14 @@ const firebaseConfig = {
             </div>
 
             <div id="page-repair" class="page-content">
-                <h2 class="text-3xl font-black mb-8 text-red-600 flex items-center gap-3 italic uppercase"><i class="fas fa-tools"></i> Repair Log</h2>
+                <h2 class="text-3xl font-black mb-8 text-red-600 italic uppercase"><i class="fas fa-tools mr-2"></i> Repair Log</h2>
                 <div id="repair-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             </div>
 
             <div id="page-backup" class="page-content">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-black text-navy border-l-8 border-yellow-400 pl-4 uppercase italic">Backup & History</h2>
-                    <button onclick="createBackup()" class="bg-navy text-white px-6 py-2 rounded-xl text-xs font-black shadow-lg uppercase italic">Manual Cloud Backup</button>
+                    <h2 class="text-3xl font-black text-navy border-l-8 border-yellow-400 pl-4 uppercase italic">Backup History</h2>
+                    <button onclick="createBackup()" class="bg-navy text-white px-6 py-2 rounded-xl text-xs font-black shadow-lg uppercase italic">Manual Backup</button>
                 </div>
                 <div id="backup-list" class="space-y-4"></div>
             </div>
@@ -107,10 +102,10 @@ const firebaseConfig = {
 
     <div id="modal" class="hidden fixed inset-0 bg-navy/60 backdrop-blur-sm flex items-center justify-center z-[110]">
         <div class="bg-white p-10 rounded-[3rem] w-full max-w-2xl shadow-2xl overflow-y-auto max-h-[95vh] border-t-8 border-yellow-400">
-            <div class="flex justify-between items-center mb-8 font-black uppercase italic">
-                <h3 id="modal-title" class="text-2xl text-navy">Asset Config</h3>
+            <div class="flex justify-between items-center mb-8 font-black uppercase italic leading-none">
+                <h3 id="modal-title" class="text-2xl text-navy">Asset Setup</h3>
                 <div id="room-master-status" onclick="toggleRoomStatus()" class="cursor-pointer flex items-center gap-2 px-6 py-2 rounded-2xl shadow-md border-2 border-white text-white bg-green-500 transition-all">
-                    <i id="master-icon" class="fas fa-check-circle"></i><span id="master-text" class="text-xs uppercase">Ready</span>
+                    <i id="master-icon" class="fas fa-check-circle"></i><span id="master-text" class="text-xs font-black uppercase">Ready</span>
                 </div>
             </div>
             <form onsubmit="saveRoomAsset(event)" class="space-y-6 font-bold">
@@ -121,10 +116,14 @@ const firebaseConfig = {
                 </div>
                 <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
                     <div class="flex justify-between items-center mb-6">
-                        <h4 class="text-sm text-navy font-black uppercase italic">Asset Checklist</h4>
-                        <button type="button" onclick="addNewAssetField()" class="text-[10px] bg-navy text-white px-4 py-1.5 rounded-full shadow-lg">+ Add Item</button>
+                        <h4 class="text-sm text-navy font-black uppercase italic">Device Checklist</h4>
+                        <button type="button" onclick="addNewAssetField()" class="text-[10px] bg-navy text-white px-5 py-2 rounded-full shadow-lg">+ Add Item</button>
                     </div>
                     <div class="space-y-2" id="checklist-container"></div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] text-slate-400 ml-4 uppercase italic">Photos (Max 6)</label>
+                    <input type="file" id="asset-images" accept="image/*" multiple onchange="validateFiles(this)" class="text-xs w-full p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
                 </div>
                 <textarea id="room-remark" placeholder="หมายเหตุ..." class="w-full p-6 bg-slate-50 rounded-[2rem] border-none h-28 outline-none font-bold"></textarea>
                 <div class="flex gap-4">
@@ -141,6 +140,7 @@ const firebaseConfig = {
         let backupData = [];
         let myChart = null;
 
+        // Firebase Sync
         db.ref('rooms').on('value', (snapshot) => {
             roomData = snapshot.val() ? Object.values(snapshot.val()) : [];
             render();
@@ -152,6 +152,7 @@ const firebaseConfig = {
             renderBackup();
         });
 
+        // Navigation
         function changePage(p) {
             document.querySelectorAll('.page-content').forEach(pg => pg.classList.remove('active'));
             document.getElementById('page-' + p).classList.add('active');
@@ -159,23 +160,11 @@ const firebaseConfig = {
             document.getElementById('btn-' + p).classList.add('active');
         }
 
+        // Image Handling
         function showImage(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.remove('hidden'); }
+        function validateFiles(input) { if (input.files.length > 6) { alert("สูงสุด 6 รูปครับ"); input.value = ""; } }
 
-        function toggleRoomStatus() {
-            const state = document.getElementById('room-state');
-            state.value = state.value === 'Ready' ? 'Repairing' : 'Ready';
-            updateMasterStatusUI(state.value === 'Repairing');
-        }
-
-        function updateMasterStatusUI(isR) {
-            const btn = document.getElementById('room-master-status');
-            const txt = document.getElementById('master-text');
-            const icon = document.getElementById('master-icon');
-            btn.className = isR ? 'cursor-pointer flex items-center gap-2 px-6 py-2 rounded-2xl shadow-md border-2 border-white text-white bg-red-500' : 'cursor-pointer flex items-center gap-2 px-6 py-2 rounded-2xl shadow-md border-2 border-white text-white bg-green-500';
-            txt.innerText = isR ? 'Closed' : 'Ready';
-            icon.className = isR ? 'fas fa-times-circle' : 'fas fa-check-circle';
-        }
-
+        // Asset Management
         function addNewAssetField(name = "", checked = true) {
             const container = document.getElementById('checklist-container');
             const div = document.createElement('div');
@@ -187,6 +176,16 @@ const firebaseConfig = {
         async function saveRoomAsset(e) {
             e.preventDefault();
             const id = document.getElementById('edit-id').value || Date.now();
+            const files = document.getElementById('asset-images').files;
+            let imgArray = [];
+            if(files.length > 0) {
+                for(let file of files) {
+                    const base64 = await new Promise(r => { const rd = new FileReader(); rd.onload = () => r(rd.result); rd.readAsDataURL(file); });
+                    imgArray.push(base64);
+                }
+            } else if (document.getElementById('edit-id').value) {
+                imgArray = roomData.find(a => a.id == id).images || [];
+            }
             const checklist = {}; let hasFail = false;
             document.querySelectorAll('#checklist-container .asset-row').forEach(item => {
                 const name = item.querySelector('input[type="text"]').value || "Unknown";
@@ -194,11 +193,26 @@ const firebaseConfig = {
                 checklist[name] = ok; if(!ok) hasFail = true;
             });
             const manualState = document.getElementById('room-state').value;
-            const data = { id, name: document.getElementById('room-name').value, date: document.getElementById('update-date').value, checklist, remark: document.getElementById('room-remark').value || "Normal", status: (manualState === 'Ready' && hasFail) ? 'Partial' : manualState, hasFail };
+            const data = { id, name: document.getElementById('room-name').value, date: document.getElementById('update-date').value, checklist, remark: document.getElementById('room-remark').value || "Normal", status: (manualState === 'Ready' && hasFail) ? 'Partial' : manualState, hasFail, images: imgArray };
             db.ref('rooms/' + id).set(data);
             closeModal();
         }
 
+        // Export Function (Excel)
+        function exportData(sourceData, fileName) {
+            if(!sourceData || sourceData.length === 0) { alert("ไม่มีข้อมูลให้ส่งออกครับ"); return; }
+            const exportRows = sourceData.map(r => {
+                const row = { "Room Name": r.name, "Check Date": r.date, "Overall Status": r.status, "Notes": r.remark };
+                Object.entries(r.checklist || {}).forEach(([name, ok]) => { row[name] = ok ? "OK" : "FAIL"; });
+                return row;
+            });
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Inventory");
+            XLSX.writeFile(wb, `${fileName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // Render Functions
         function render() {
             const perfect = roomData.filter(r => r.status === 'Ready').length;
             const partial = roomData.filter(r => r.status === 'Partial').length;
@@ -210,24 +224,25 @@ const firebaseConfig = {
             updateChart(perfect, partial, out);
 
             const container = document.getElementById('room-list-container');
-            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const searchVal = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : "";
             container.innerHTML = roomData.filter(r => r.name.toLowerCase().includes(searchVal)).map(r => `
                 <div class="room-card bg-white p-8 shadow-sm flex flex-col md:flex-row gap-8" style="border-left-color: ${r.status==='Ready'?'#10b981':r.status==='Partial'?'#f59e0b':'#ef4444'}">
                     <div class="flex-1">
-                        <div class="flex justify-between items-start mb-6">
-                            <h3 class="text-2xl font-black text-navy uppercase italic tracking-tighter">${r.name}</h3>
-                            <span class="px-5 py-1.5 rounded-full text-[10px] font-black uppercase ${r.status==='Ready'?'bg-green-100 text-green-700':r.status==='Partial'?'bg-orange-100 text-orange-700':'bg-red-100 text-red-700'}">${r.status}</span>
+                        <div class="flex justify-between items-start mb-6 leading-none">
+                            <div><h3 class="text-2xl font-black text-navy uppercase italic tracking-tighter">${r.name}</h3><div class="flex gap-2 mt-4">${(r.images || []).map(img => `<img src="${img}" class="photo-thumb shadow-sm" onclick="showImage('${img}')">`).join('')}</div></div>
+                            <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${r.status==='Ready'?'bg-green-100 text-green-700':r.status==='Partial'?'bg-orange-100 text-orange-700':'bg-red-100 text-red-700'}">${r.status}</span>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            ${Object.entries(r.checklist || {}).map(([n, ok]) => `<div class="p-3 rounded-2xl text-[10px] uppercase border-2 flex items-center gap-2 ${ok ? 'bg-slate-50' : 'bg-red-50 text-red-600 border-red-100'}"><i class="fas ${ok ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500'}"></i>${n}</div>`).join('')}
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                            ${Object.entries(r.checklist || {}).map(([n, ok]) => `<div class="p-3 rounded-2xl text-[10px] uppercase border-2 flex items-center gap-2 ${ok ? 'bg-slate-50 border-slate-100 text-slate-400' : 'bg-red-50 border-red-100 text-red-600'}"><i class="fas ${ok ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500'}"></i>${n}</div>`).join('')}
                         </div>
+                        <p class="text-[11px] text-slate-400 italic font-black">Note: ${r.remark}</p>
                     </div>
                     <div class="flex md:flex-col gap-3 justify-center border-l pl-8 border-slate-100">
                         <button onclick="openModal(${r.id})" class="p-4 bg-blue-50 text-blue-600 rounded-2xl hover:scale-110 transition-transform"><i class="fas fa-edit"></i></button>
                         <button onclick="deleteRoom(${r.id})" class="p-4 bg-red-50 text-red-600 rounded-2xl hover:scale-110 transition-transform"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-            `).join('') || '<p class="text-center py-20 text-slate-300 font-black italic">No Data</p>';
+            `).join('') || '<p class="text-center py-20 text-slate-300 font-black italic uppercase">No Data Found</p>';
         }
 
         function renderRepair() {
@@ -235,42 +250,44 @@ const firebaseConfig = {
             if(!list) return;
             list.innerHTML = roomData.filter(r => r.hasFail).map(r => `
                 <div class="bg-white p-6 rounded-[2.5rem] border-l-[12px] border-orange-500 shadow-sm flex items-center justify-between font-black italic">
-                    <div><h4 class="text-navy text-sm uppercase">${r.name}</h4><p class="text-[10px] text-red-500 uppercase">Fail: ${Object.entries(r.checklist).filter(([n, ok])=>!ok).map(([n])=>n).join(', ')}</p></div>
+                    <div><h4 class="text-navy text-sm uppercase">${r.name}</h4><p class="text-[10px] text-red-500 uppercase font-black">FAIL: ${Object.entries(r.checklist).filter(([n, ok])=>!ok).map(([n])=>n).join(', ')}</p></div>
                     <button onclick="openModal(${r.id})" class="bg-navy text-white px-5 py-2 rounded-xl text-[10px] uppercase italic">Detail</button>
                 </div>
-            `).join('') || '<p class="text-center py-10 text-slate-300 w-full col-span-2 font-black italic">All Systems Ready</p>';
+            `).join('') || '<p class="text-center py-10 text-slate-300 w-full col-span-2 font-black italic uppercase">All Systems Clear</p>';
         }
 
         function updateChart(pe, pa, ou) {
             const ctx = document.getElementById('roomPieChart').getContext('2d');
             if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Perfect', 'Partial', 'Closed'], datasets: [{ data: [pe, pa, ou], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 10, borderColor: '#ffffff' }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } } });
+            myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Perfect', 'Partial', 'Closed'], datasets: [{ data: [pe, pa, ou], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 10, borderColor: '#ffffff' }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } } });
         }
 
-        function createBackup() { 
-            const id = Date.now(); 
-            db.ref('backups/' + id).set({ id, label: new Date().toLocaleString('th-TH'), data: roomData }); 
-            alert("Backup Saved!"); 
-        }
-
+        function createBackup() { const id = Date.now(); db.ref('backups/' + id).set({ id, label: new Date().toLocaleString('th-TH'), data: roomData }); alert("Cloud Backup Created!"); }
+        
         function renderBackup() {
             const container = document.getElementById('backup-list');
             if(!container) return;
             container.innerHTML = backupData.map(b => `
-                <div class="bg-white p-5 rounded-[2rem] border flex justify-between items-center shadow-sm">
-                    <span class="text-sm font-black text-navy italic">${b.label} (${b.data.length} Rooms)</span>
+                <div class="bg-white p-5 rounded-[2rem] border-2 border-slate-50 flex justify-between items-center shadow-sm">
+                    <span class="text-sm font-black text-navy uppercase italic">${b.label} (${b.data.length} Rooms)</span>
                     <div class="flex gap-2">
-                        <button onclick="exportData(backupData.find(x=>x.id===${b.id}).data, 'Backup_Report')" class="bg-green-600 text-white px-5 py-2 rounded-xl text-xs"><i class="fas fa-file-excel"></i></button>
-                        <button onclick="restoreBackup(${b.id})" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase italic">Restore</button>
+                        <button onclick="exportData(backupData.find(x=>x.id===${b.id}).data, 'Backup_Report_${b.label}')" class="bg-green-600 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase"><i class="fas fa-file-excel mr-1"></i> Excel</button>
+                        <button onclick="restoreBackup(${b.id})" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase italic shadow-md">Restore</button>
+                        <button onclick="deleteBackup(${b.id})" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] uppercase shadow-sm"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-            `).join('') || '<p class="text-center py-10 text-slate-300 font-black italic">No Backups</p>';
+            `).join('') || '<p class="text-center py-10 text-slate-300 font-black italic uppercase">No Backup History</p>';
         }
 
-        function restoreBackup(id) { if(confirm('Restore?')) { const b = backupData.find(x => x.id === id); db.ref('rooms').set(null); b.data.forEach(r => db.ref('rooms/' + r.id).set(r)); } }
+        function restoreBackup(id) { if(confirm('ต้องการกู้คืนข้อมูลชุดนี้หรือไม่?')) { const b = backupData.find(x => x.id === id); db.ref('rooms').set(null); (b.data || []).forEach(r => db.ref('rooms/' + r.id).set(r)); } }
+        function deleteBackup(id) { if(confirm('ลบประวัตินี้ถาวร?')) db.ref('backups/' + id).remove(); }
+        function deleteRoom(id) { if(confirm('ลบห้องประชุมนี้ถาวร?')) db.ref('rooms/' + id).remove(); }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        
         function openModal(id = null) {
             document.getElementById('modal').classList.remove('hidden');
             const container = document.getElementById('checklist-container'); container.innerHTML = '';
+            document.getElementById('asset-images').value = "";
             if(id) {
                 const r = roomData.find(x => x.id == id);
                 document.getElementById('edit-id').value = r.id; document.getElementById('room-name').value = r.name;
@@ -285,13 +302,9 @@ const firebaseConfig = {
                 document.getElementById('room-state').value = 'Ready'; updateMasterStatusUI(false);
             }
         }
-        function deleteRoom(id) { if(confirm('Delete?')) db.ref('rooms/' + id).remove(); }
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        function exportData(d, f) {
-            const ws = XLSX.utils.json_to_sheet(d.map(r => ({ Room: r.name, Date: r.date, Status: r.status, Notes: r.remark, ...r.checklist })));
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Inventory");
-            XLSX.writeFile(wb, `${f}_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
+
+        function toggleRoomStatus() { const s = document.getElementById('room-state'); s.value = s.value === 'Ready' ? 'Repairing' : 'Ready'; updateMasterStatusUI(s.value === 'Repairing'); }
+        function updateMasterStatusUI(isR) { const btn = document.getElementById('room-master-status'); const txt = document.getElementById('master-text'); const icon = document.getElementById('master-icon'); btn.className = isR ? 'cursor-pointer flex items-center gap-2 px-6 py-2 rounded-2xl bg-red-500 text-white shadow-md' : 'cursor-pointer flex items-center gap-2 px-6 py-2 rounded-2xl bg-green-500 text-white shadow-md'; txt.innerText = isR ? 'Closed' : 'Ready'; icon.className = isR ? 'fas fa-times-circle' : 'fas fa-check-circle'; }
     </script>
 </body>
 </html>
