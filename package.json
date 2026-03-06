@@ -1,0 +1,17 @@
+{
+  "name": "iroom-management",
+  "version": "1.0.0",
+  "description": "iRoom Cloud - Complete Management System for room assets",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx live-server --port=3000",
+    "dev": "npx live-server --port=3000 --open",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": ["room-management", "firebase", "web-app"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
